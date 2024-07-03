@@ -18,6 +18,14 @@ class UserService(
 {
     @Transactional
     fun signUp(userSignUpRequest: UserSignUpRequest): UserResponse {
+        val (username, password) = userSignUpRequest
+
+        validateUsername(username)
+        validatePassword(password,username)
+
+        if (userRepository.existsByUsername(userSignUpRequest.username)) {
+            throw UsernameDuplicateException()
+        }
 
         return UserResponse.from(userRepository.save(userSignUpRequest.toEntity(userSignUpRequest)))
     }
@@ -25,13 +33,19 @@ class UserService(
     @Transactional
     fun login(userLogInRequest: UserLogInRequest): UserResponse {
         val user = userRepository.findByUsername(userLogInRequest.username)
-            ?: throw RuntimeException("User does not exists")
+            ?: throw LoginValidationException()
 
-        return UserResponse.from(userRepository.save(user))
+        // passwordEncoder 적용해야할 것!
+        if (user.username != userLogInRequest.username ||
+            user.password != userLogInRequest.password) {
+            throw LoginValidationException()
+        }
+
+        return UserResponse.from(user)
     }
 }
 
-private fun validateNickname(username: String) {
+private fun validateUsername(username: String) {
 
     if (!Pattern.matches(
             "^[a-zA-Z0-9]{3,10}$",
