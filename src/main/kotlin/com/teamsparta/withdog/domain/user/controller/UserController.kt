@@ -3,6 +3,7 @@ package com.teamsparta.withdog.domain.user.controller
 import com.teamsparta.withdog.domain.user.dto.UserResponse
 import com.teamsparta.withdog.domain.user.dto.UserSignUpRequest
 import com.teamsparta.withdog.domain.user.service.UserService
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -19,6 +20,7 @@ class UserController (
     @PostMapping("/register")
     fun signUp(@RequestBody userSignUpRequest: UserSignUpRequest): ResponseEntity<UserResponse> {
         userService.signUp(userSignUpRequest)
-        // TODO 응답 반환
+        return ResponseEntity.status(HttpStatus.CREATED).build()
     }
+
 }
