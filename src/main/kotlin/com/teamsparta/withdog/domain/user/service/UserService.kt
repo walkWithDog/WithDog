@@ -1,5 +1,6 @@
 package com.teamsparta.withdog.domain.user.service
 
+import com.teamsparta.withdog.domain.user.dto.UserLogInRequest
 import com.teamsparta.withdog.domain.user.dto.UserResponse
 import com.teamsparta.withdog.domain.user.dto.UserSignUpRequest
 import com.teamsparta.withdog.domain.user.dto.toEntity
@@ -9,13 +10,21 @@ import org.springframework.transaction.annotation.Transactional
 
 
 @Service
-class UserService (
+class UserService(
     private val userRepository: UserRepository
 ) {
 
     @Transactional
-    fun signUp(userSignUpRequest: UserSignUpRequest): UserResponse  {
+    fun signUp(userSignUpRequest: UserSignUpRequest): UserResponse {
 
         return UserResponse.from(userRepository.save(userSignUpRequest.toEntity(userSignUpRequest)))
+    }
+
+    @Transactional
+    fun login(userLogInRequest: UserLogInRequest): UserResponse {
+        val user = userRepository.findByUsername(userLogInRequest.username)
+            ?: throw RuntimeException("User does not exists")
+
+        return UserResponse.from(userRepository.save(user))
     }
 }

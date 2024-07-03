@@ -1,5 +1,6 @@
 package com.teamsparta.withdog.domain.user.controller
 
+import com.teamsparta.withdog.domain.user.dto.UserLogInRequest
 import com.teamsparta.withdog.domain.user.dto.UserResponse
 import com.teamsparta.withdog.domain.user.dto.UserSignUpRequest
 import com.teamsparta.withdog.domain.user.service.UserService
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/users")
-class UserController (
+class UserController(
     private val userService: UserService
 ) {
 
@@ -21,6 +22,12 @@ class UserController (
     fun signUp(@RequestBody userSignUpRequest: UserSignUpRequest): ResponseEntity<UserResponse> {
         userService.signUp(userSignUpRequest)
         return ResponseEntity.status(HttpStatus.CREATED).build()
+    }
+
+    @PostMapping("/login")
+    fun logIn(@RequestBody userLogInRequest: UserLogInRequest): ResponseEntity<UserResponse> {
+        userService.login(userLogInRequest)
+        return ResponseEntity.status(HttpStatus.OK).build()
     }
 
 }
