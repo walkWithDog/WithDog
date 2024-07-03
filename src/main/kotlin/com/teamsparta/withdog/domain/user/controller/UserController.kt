@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/users")
 class UserController(
     private val userService: UserService
-) {
-
+)
+{
     @PostMapping("/register")
     fun signUp(@RequestBody userSignUpRequest: UserSignUpRequest): ResponseEntity<UserResponse> {
         userService.signUp(userSignUpRequest)
@@ -29,5 +29,4 @@ class UserController(
         userService.login(userLogInRequest)
         return ResponseEntity.status(HttpStatus.OK).build()
     }
-
 }
