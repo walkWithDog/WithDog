@@ -8,11 +8,11 @@ data class UserSignUpRequest(
     val nickname: String
 )
 
-fun UserSignUpRequest.toEntity(request: UserSignUpRequest): User
+fun UserSignUpRequest.toEntity(): User
 {
     return User(
-        username = request.username,
-        password = request.password,
-        nickname = request.nickname
+        username = this.username,
+        password = this.password,
+        nickname = this.nickname
     )
 }

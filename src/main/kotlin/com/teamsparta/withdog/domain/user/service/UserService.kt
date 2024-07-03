@@ -1,12 +1,11 @@
 package com.teamsparta.withdog.domain.user.service
 
-import com.teamsparta.withdog.domain.exception.*
 import com.teamsparta.withdog.domain.user.dto.*
 import com.teamsparta.withdog.domain.user.repository.UserRepository
+import com.teamsparta.withdog.global.exception.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.regex.Pattern
-
 
 @Service
 class UserService(
@@ -27,7 +26,7 @@ class UserService(
             throw UsernameDuplicateException()
         }
 
-        return UserResponse.from(userRepository.save(userSignUpRequest.toEntity(userSignUpRequest)))
+        return UserResponse.from(userRepository.save(userSignUpRequest.toEntity()))
     }
 
     @Transactional
