@@ -1,0 +1,79 @@
+package com.teamsparta.withdog.domain.post.controller
+
+import com.teamsparta.withdog.domain.post.dto.PageResponse
+import com.teamsparta.withdog.domain.post.dto.PostRequest
+import com.teamsparta.withdog.domain.post.dto.PostResponse
+import com.teamsparta.withdog.domain.post.service.PostService
+import com.teamsparta.withdog.infra.security.jwt.UserPrincipal
+import jakarta.validation.Valid
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
+
+@RestController
+@RequestMapping("/api/v1/posts")
+class PostController(
+    private val postService: PostService
+)
+{
+    @GetMapping
+    fun getPostList(
+        @RequestParam("page", defaultValue = "0") page: Int,
+        @RequestParam("size", defaultValue = "10") size: Int,
+        @RequestParam("sort_by", defaultValue = "createdAt") sortBy: String,
+        @RequestParam("sort_direction", defaultValue = "desc") direction: String,
+    ): ResponseEntity<PageResponse<PostResponse>>
+    {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(postService.getPostList(page, size, sortBy, direction))
+    }
+
+    @GetMapping("/{postId}")
+    fun getPostById(
+        @PathVariable postId: Long
+    ): ResponseEntity<PostResponse>
+    {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(postService.getPostById(postId))
+    }
+
+    @PostMapping
+    fun createPost(
+        @AuthenticationPrincipal principal: UserPrincipal,
+        @Valid @RequestPart("request") postRequest: PostRequest,
+        @RequestPart("image", required = false) image: MultipartFile?
+    ): ResponseEntity<PostResponse>
+    {
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(postService.createPost(principal.id, postRequest, image))
+    }
+
+    @PutMapping("/{postId}")
+    fun updatePost(
+        @PathVariable postId: Long,
+        @AuthenticationPrincipal principal: UserPrincipal,
+        @Valid @RequestPart("request") postRequest: PostRequest,
+        @RequestPart("image", required = false) image: MultipartFile?
+    ): ResponseEntity<PostResponse>
+    {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(postService.updatePost(postId, principal.id, postRequest, image))
+    }
+
+    @DeleteMapping("/{postId}")
+    fun deletePost(
+        @PathVariable postId: Long,
+        @AuthenticationPrincipal principal: UserPrincipal
+    ): ResponseEntity<Unit>
+    {
+        return ResponseEntity
+            .status(HttpStatus.NO_CONTENT)
+            .body(postService.deletePost(postId, principal.id))
+    }
+}
