@@ -7,14 +7,15 @@ data class UserResponse(
     val username: String,
     val nickname: String
 ) {
-    companion object {
-        fun from(saveUser: User): UserResponse {
+    companion object
+    {
+        fun from(saveUser: User): UserResponse
+        {
 
             return UserResponse(
                 saveUser.id,
                 saveUser.username,
                 saveUser.nickname
-
             )
 
         }
