@@ -15,9 +15,8 @@ data class UserResponse(
             return UserResponse(
                 saveUser.id,
                 saveUser.username,
-                saveUser.nickname
+                saveUser.profile.nickname
             )
-
         }
     }
 }

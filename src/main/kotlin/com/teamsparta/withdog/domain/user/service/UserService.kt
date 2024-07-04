@@ -2,7 +2,10 @@ package com.teamsparta.withdog.domain.user.service
 
 import com.teamsparta.withdog.domain.exception.*
 import com.teamsparta.withdog.domain.user.dto.*
+import com.teamsparta.withdog.domain.user.model.User
+import com.teamsparta.withdog.domain.user.model.UserProfile
 import com.teamsparta.withdog.domain.user.repository.UserRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.regex.Pattern
@@ -17,20 +20,29 @@ class UserService(
         userSignUpRequest: UserSignUpRequest
     ): UserResponse
     {
-        val (username, password) = userSignUpRequest
+        val (username, password, nickname) = userSignUpRequest
 
         validateUsername(username)
         validatePassword(password, username)
+        validateNickname(nickname)
 
         if (userRepository.existsByUsername(userSignUpRequest.username))
         {
             throw UsernameDuplicateException()
         }
 
-        return UserResponse.from(userRepository.save(userSignUpRequest.toEntity(userSignUpRequest)))
+       val user = User(
+           username = userSignUpRequest.username,
+           password = userSignUpRequest.password,
+           profile = UserProfile(userSignUpRequest.username)
+       )
+
+        val savedUser = userRepository.save(user)
+
+        return UserResponse.from(savedUser)
     }
 
-    @Transactional
+
     fun login(
         userLogInRequest: UserLogInRequest
     ): UserResponse
@@ -47,6 +59,22 @@ class UserService(
         }
 
         return UserResponse.from(user)
+    }
+
+    @Transactional
+    fun updateProfile(
+        userUpdateProfileRequest: UserUpdateProfileRequest, userId : Long
+    ): UserResponse
+    {
+
+        val user = userRepository.findByIdOrNull(userId) ?: throw ModelNotFoundException("User", userId)
+        if (userUpdateProfileRequest.password != userUpdateProfileRequest.passwordConfirmation) throw PasswordInvalidException()
+
+        val password = userUpdateProfileRequest.password
+        user.updateProfile(userUpdateProfileRequest, password)
+
+        return UserResponse.from(user)
+
     }
 }
 
@@ -79,5 +107,18 @@ private fun validatePassword(
     if (password.contains(username))
     {
         throw PasswordContainsUsernameException()
+    }
+}
+
+private fun validateNickname(
+    nickname: String
+) {
+    if (!Pattern.matches(
+        "^[가-힣a-zA-Z0-9]{2,8}$",
+        nickname
+    )
+        )
+    {
+        throw NicknameInvalidException()
     }
 }

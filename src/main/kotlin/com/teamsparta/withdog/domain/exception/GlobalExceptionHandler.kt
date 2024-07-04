@@ -6,9 +6,17 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 
+
 @RestControllerAdvice
 class GlobalExceptionHandler
 {
+    @ExceptionHandler(ModelNotFoundException::class)
+    fun handleModelNotFoundException(ex: ModelNotFoundException): ResponseEntity<ErrorResponse>
+    {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ErrorResponse(ex.message))
+    }
+
+
     @ExceptionHandler(UsernameDuplicateException::class)
     fun handleUsernameDuplicateException(ex: UsernameDuplicateException): ResponseEntity<ErrorResponse>
     {
@@ -35,6 +43,12 @@ class GlobalExceptionHandler
 
     @ExceptionHandler(LoginValidationException::class)
     fun handleLoginValidationException(ex: LoginValidationException): ResponseEntity<ErrorResponse>
+    {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorResponse(message = ex.message))
+    }
+
+    @ExceptionHandler(PasswordInvalidException::class)
+    fun handlePasswordInvalidException(ex: PasswordInvalidException): ResponseEntity<ErrorResponse>
     {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorResponse(message = ex.message))
     }
