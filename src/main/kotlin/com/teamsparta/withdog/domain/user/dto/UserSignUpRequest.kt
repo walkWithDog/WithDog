@@ -1,18 +1,10 @@
 package com.teamsparta.withdog.domain.user.dto
 
-import com.teamsparta.withdog.domain.user.model.User
+import com.teamsparta.withdog.domain.user.model.UserRole
 
 data class UserSignUpRequest(
     val username: String,
     val password: String,
-    val nickname: String
+    val nickname: String,
+    val role: UserRole = UserRole.USER
 )
-
-fun UserSignUpRequest.toEntity(): User
-{
-    return User(
-        username = this.username,
-        password = this.password,
-        nickname = this.nickname
-    )
-}
