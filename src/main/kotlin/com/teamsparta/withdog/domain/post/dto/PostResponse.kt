@@ -10,9 +10,9 @@ data class PostResponse(
     val content: String,
     val nickname: String,
     val imageUrl: String?,
+    val likes: Int,
     val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime?,
-    val isDeleted: Boolean
+    val updatedAt: LocalDateTime?
 )
 {
     companion object{
@@ -27,9 +27,9 @@ data class PostResponse(
                 post.content,
                 post.user.nickname,
                 post.imageUrl,
+                post.likes.size,
                 post.createdAt,
-                post.updatedAt,
-                post.isDeleted
+                post.updatedAt
             )
         }
     }

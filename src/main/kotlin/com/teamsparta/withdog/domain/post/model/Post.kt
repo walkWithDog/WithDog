@@ -1,5 +1,6 @@
 package com.teamsparta.withdog.domain.post.model
 
+import com.teamsparta.withdog.domain.like.model.Like
 import com.teamsparta.withdog.domain.post.dto.PostRequest
 import com.teamsparta.withdog.domain.user.model.User
 import jakarta.persistence.*
@@ -31,7 +32,10 @@ class Post(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    val user: User
+    val user: User,
+
+    @OneToMany(mappedBy = "post", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val likes: MutableList<Like> = mutableListOf()
 )
 {
     @Id
@@ -40,14 +44,17 @@ class Post(
 
     fun updatePost(
         postRequest: PostRequest,
-        image: String?) {
+        image: String?
+    )
+    {
         title = postRequest.title
         content = postRequest.content
         imageUrl = image
         updatedAt = LocalDateTime.now()
     }
 
-    fun softDeleted(){
+    fun softDeleted()
+    {
         isDeleted = true
     }
 }

@@ -1,5 +1,6 @@
 package com.teamsparta.withdog.domain.post.service
 
+import com.teamsparta.withdog.domain.like.service.LikeService
 import com.teamsparta.withdog.domain.post.dto.PageResponse
 import com.teamsparta.withdog.domain.post.dto.PostRequest
 import com.teamsparta.withdog.domain.post.dto.PostResponse
@@ -21,7 +22,8 @@ import org.springframework.web.multipart.MultipartFile
 class PostService(
     private val postRepository: PostRepository,
     private val userRepository: UserRepository,
-    private val s3Service: S3Service
+    private val s3Service: S3Service,
+    private val likeService: LikeService
 )
 {
     fun getPostList(
@@ -78,7 +80,7 @@ class PostService(
         if (post.isDeleted)
             throw ModelNotFoundException("삭제된 게시글 입니다.")
 
-        if(userId != post.user.id )
+        if(userId != post.user.id)
             throw UnauthorizedException("권한이 없습니다.")
 
         post.imageUrl?.let { s3Service.delete(it.split("m/")[1]) }
@@ -100,11 +102,26 @@ class PostService(
         if (post.isDeleted)
             throw ModelNotFoundException("삭제된 게시글 입니다.")
 
-        if(userId != post.user.id )
+        if(userId != post.user.id)
             throw UnauthorizedException("권한이 없습니다.")
 
         post.imageUrl?.let { s3Service.delete(it.split("m/")[1]) }
         post.softDeleted()
+        likeService.deleteLike(post)
+    }
+
+    fun postLike(
+        postId: Long,
+        userId: Long
+    )
+    {
+        val post = postRepository.findByIdOrNull(postId)
+            ?: throw ModelNotFoundException("삭제된 게시글입니다.")
+
+        if (post.isDeleted)
+            throw ModelNotFoundException("삭제된 게시글 입니다.")
+
+        likeService.updateLike(userId, post)
     }
 
     private fun getDirection(sort: String) = when (sort)

@@ -76,4 +76,16 @@ class PostController(
             .status(HttpStatus.NO_CONTENT)
             .body(postService.deletePost(postId, principal.id))
     }
+
+    @PostMapping("/{postId}/like")
+    fun postLike(
+        @PathVariable postId: Long,
+        @AuthenticationPrincipal principal: UserPrincipal
+    ): ResponseEntity<Unit> {
+        postService.postLike(postId, principal.id)
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .build()
+    }
 }
