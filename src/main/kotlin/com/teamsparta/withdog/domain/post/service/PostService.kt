@@ -9,6 +9,9 @@ import com.teamsparta.withdog.domain.user.repository.UserRepository
 import com.teamsparta.withdog.global.exception.ModelNotFoundException
 import com.teamsparta.withdog.global.exception.UnauthorizedException
 import com.teamsparta.withdog.infra.s3.S3Service
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.CachePut
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
@@ -28,6 +31,8 @@ class PostService(
 )
 {
 
+
+    @Cacheable(value = ["popularPostCache"], key = "'getPopularPostList'") // 심히 테스트가 필요한 대목
     fun getPopularPostList()
     : List<PopularPostResponse>
     {
@@ -52,6 +57,7 @@ class PostService(
         return PageResponse(pageContent.content.map {PostResponse.from(it, commentService.getCommentList(it.id!!))}, page, size)
     }
 
+    @Cacheable(value = ["postCache"], key = "#postId")
     fun getPostById(
         postId: Long
     ): PostResponse
@@ -77,6 +83,7 @@ class PostService(
         return PostResponse.from(postRepository.save(postRequest.toEntity(user, fileUrl)), null)
     }
 
+    @CachePut(value = ["postCache"], key = "#postId")
     @Transactional
     fun updatePost(
         postId: Long,
@@ -101,6 +108,7 @@ class PostService(
         return PostResponse.from(post, commentService.getCommentList(postId))
     }
 
+    @CacheEvict(value = ["postCache"], key = "#postId")
     @Transactional
     fun deletePost(
         postId: Long,

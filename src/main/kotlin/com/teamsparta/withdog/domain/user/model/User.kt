@@ -18,4 +18,5 @@ class User(
 
     @Column(name = "nickname", nullable = false)
     var nickname: String,
+
 )
