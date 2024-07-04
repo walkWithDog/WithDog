@@ -3,7 +3,6 @@ package com.teamsparta.withdog.domain.user.model
 import com.teamsparta.withdog.domain.user.dto.UserUpdateProfileRequest
 import jakarta.persistence.*
 
-
 @Entity
 @Table(name = "users")
 class User(
@@ -19,6 +18,10 @@ class User(
 
     @Embedded
     var profile: UserProfile,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    val role: UserRole = UserRole.USER
 )
 {
     fun updateProfile(userUpdateProfileRequest: UserUpdateProfileRequest, password: String)
@@ -27,3 +30,4 @@ class User(
         this.profile.nickname = userUpdateProfileRequest.nickname
     }
 }
+

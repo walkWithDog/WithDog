@@ -7,16 +7,31 @@ data class UserResponse(
     val username: String,
     val nickname: String
 ) {
+    var token : String? = null
+
     companion object
     {
         fun from(saveUser: User): UserResponse
         {
-
             return UserResponse(
                 saveUser.id,
                 saveUser.username,
                 saveUser.profile.nickname
             )
         }
+
+        fun from(saveUser: User, token : String): UserResponse
+        {
+            val userResponse = UserResponse(
+                saveUser.id,
+                saveUser.username,
+                saveUser.profile.nickname
+            )
+            userResponse.token = token
+
+            return userResponse
+        }
     }
+
+
 }

@@ -3,9 +3,12 @@ package com.teamsparta.withdog.domain.user.service
 import com.teamsparta.withdog.domain.user.dto.*
 import com.teamsparta.withdog.domain.user.model.User
 import com.teamsparta.withdog.domain.user.model.UserProfile
+import com.teamsparta.withdog.domain.user.model.UserRole
 import com.teamsparta.withdog.domain.user.repository.UserRepository
 import com.teamsparta.withdog.global.exception.*
+import com.teamsparta.withdog.infra.security.jwt.JwtPlugin
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.regex.Pattern
@@ -13,7 +16,9 @@ import java.util.regex.Pattern
 
 @Service
 class UserService(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val passwordEncoder: PasswordEncoder,
+    private val jwtPlugin: JwtPlugin
 ) {
     @Transactional
     fun signUp(
@@ -33,8 +38,9 @@ class UserService(
 
        val user = User(
            username = userSignUpRequest.username,
-           password = userSignUpRequest.password,
-           profile = UserProfile(userSignUpRequest.username)
+           password = passwordEncoder.encode(userSignUpRequest.password),
+           profile = UserProfile(userSignUpRequest.username),
+           role = UserRole.USER
        )
 
         val savedUser = userRepository.save(user)
@@ -50,15 +56,22 @@ class UserService(
         val user = userRepository.findByUsername(userLogInRequest.username)
             ?: throw LoginValidationException()
 
-        // passwordEncoder 적용해야할 것!
+
         if (user.username != userLogInRequest.username ||
-            user.password != userLogInRequest.password
-        )
+            !passwordEncoder.matches(userLogInRequest.password, user.password))
+
         {
             throw LoginValidationException()
         }
 
-        return UserResponse.from(user)
+        val token = jwtPlugin.generateAccessToken(
+            subject = user.id.toString(),
+            username = user.username,
+            role = UserRole.USER.toString()
+
+        )
+
+        return UserResponse.from(user, token)
     }
 
     @Transactional
