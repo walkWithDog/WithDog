@@ -66,6 +66,8 @@ class PostService(
             ?: throw ModelNotFoundException("삭제된 게시글 입니다.")
         if (post.isDeleted) throw ModelNotFoundException("삭제된 게시글 입니다.")
 
+        post.views +=1
+        postRepository.save(post) // TODO() 컨트롤러에서 증가시켜볼까
         return PostResponse.from(post, commentService.getCommentList(postId))
     }
 

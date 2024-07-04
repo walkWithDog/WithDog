@@ -2,6 +2,7 @@ package com.teamsparta.withdog.domain.post.dto
 
 import com.teamsparta.withdog.domain.comment.dto.CommentResponse
 import com.teamsparta.withdog.domain.post.model.Post
+import java.io.Serializable
 import java.time.LocalDateTime
 
 data class PostResponse(
@@ -15,7 +16,7 @@ data class PostResponse(
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime?,
     val comments: List<CommentResponse>?
-)
+): Serializable
 {
     companion object{
         fun from(

@@ -38,7 +38,6 @@ class SecurityConfig(
                     "/v3/api-docs/**",
                     "/error",
                     "/api/v1/users/**",
-                    ""
                 ).permitAll()
                     .anyRequest().authenticated()
             }
