@@ -76,6 +76,12 @@ class UserService(
         return UserResponse.from(user)
 
     }
+
+    fun getProfileById(userId: Long): UserResponse {
+        val user = userRepository.findByIdOrNull(userId) ?: throw ModelNotFoundException("User", userId)
+
+        return UserResponse.from(user)
+    }
 }
 
 private fun validateUsername(

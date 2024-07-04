@@ -2,10 +2,9 @@ package com.teamsparta.withdog.domain.user.controller
 
 import com.teamsparta.withdog.domain.user.dto.*
 import com.teamsparta.withdog.domain.user.service.UserService
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 
@@ -34,10 +33,22 @@ class UserController(
 
     @PatchMapping("/users/profile")
     fun updateProfile(
-       @RequestBody userUpdateProfileRequest: UserUpdateProfileRequest
+        @AuthenticationPrincipal userPrincipal: UserPrincipal,
+        @RequestBody userUpdateProfileRequest: UserUpdateProfileRequest
     ): ResponseEntity<UserResponse>
     {
-        userService.updateProfile(userUpdateProfileRequest)
+        userService.updateProfile(userUpdateProfileRequest, userPrincipal.id)
         return ResponseEntity.status(HttpStatus.OK).build()
+    }
+
+    @GetMapping("/{userId}")
+    fun getProfileById(
+        @PathVariable userId : Long
+    ): ResponseEntity<UserResponse>
+    {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(userService.getProfileById(userId))
+
     }
 }
