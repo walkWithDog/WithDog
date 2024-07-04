@@ -1,5 +1,6 @@
 package com.teamsparta.withdog.domain.post.service
 
+import com.teamsparta.withdog.domain.comment.service.CommentService
 import com.teamsparta.withdog.domain.like.service.LikeService
 import com.teamsparta.withdog.domain.post.dto.PageResponse
 import com.teamsparta.withdog.domain.post.dto.PostRequest
@@ -23,7 +24,8 @@ class PostService(
     private val postRepository: PostRepository,
     private val userRepository: UserRepository,
     private val s3Service: S3Service,
-    private val likeService: LikeService
+    private val likeService: LikeService,
+    private val commentService: CommentService
 )
 {
     fun getPostList(
@@ -38,7 +40,7 @@ class PostService(
 
         val pageContent = postRepository.findByIsDeletedFalseAndPageable(pageable)
 
-        return PageResponse(pageContent.content.map {PostResponse.from(it)}, page, size)
+        return PageResponse(pageContent.content.map {PostResponse.from(it, commentService.getCommentList(it.id!!))}, page, size)
     }
 
     fun getPostById(
@@ -49,7 +51,7 @@ class PostService(
             ?: throw ModelNotFoundException("삭제된 게시글 입니다.")
         if (post.isDeleted) throw ModelNotFoundException("삭제된 게시글 입니다.")
 
-        return PostResponse.from(post)
+        return PostResponse.from(post, commentService.getCommentList(postId))
     }
 
     @Transactional
@@ -63,7 +65,7 @@ class PostService(
             ?: throw ModelNotFoundException("없는 사용자 입니다.")
         val fileUrl = image?.let { s3Service.upload(it) }
 
-        return PostResponse.from(postRepository.save(postRequest.toEntity(user, fileUrl)))
+        return PostResponse.from(postRepository.save(postRequest.toEntity(user, fileUrl)), null)
     }
 
     @Transactional
@@ -87,7 +89,7 @@ class PostService(
         val imageUrl = image?.let { s3Service.upload(it) }
 
         post.updatePost(postRequest, imageUrl)
-        return PostResponse.from(post)
+        return PostResponse.from(post, commentService.getCommentList(postId))
     }
 
     @Transactional
