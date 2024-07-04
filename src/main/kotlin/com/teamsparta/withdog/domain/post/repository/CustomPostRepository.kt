@@ -7,4 +7,6 @@ import org.springframework.data.domain.Pageable
 interface CustomPostRepository
 {
     fun findByIsDeletedFalseAndPageable(pageable: Pageable): Page<Post>
+
+    fun findTop10ByIsDeletedFalseOrderByViewsDesc(): List<Post>
 }

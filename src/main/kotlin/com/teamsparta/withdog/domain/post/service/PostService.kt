@@ -2,10 +2,8 @@ package com.teamsparta.withdog.domain.post.service
 
 import com.teamsparta.withdog.domain.comment.service.CommentService
 import com.teamsparta.withdog.domain.like.service.LikeService
-import com.teamsparta.withdog.domain.post.dto.PageResponse
-import com.teamsparta.withdog.domain.post.dto.PostRequest
-import com.teamsparta.withdog.domain.post.dto.PostResponse
-import com.teamsparta.withdog.domain.post.dto.toEntity
+import com.teamsparta.withdog.domain.post.dto.*
+import com.teamsparta.withdog.domain.post.model.Post
 import com.teamsparta.withdog.domain.post.repository.PostRepository
 import com.teamsparta.withdog.domain.user.repository.UserRepository
 import com.teamsparta.withdog.global.exception.ModelNotFoundException
@@ -15,6 +13,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
@@ -28,6 +27,16 @@ class PostService(
     private val commentService: CommentService
 )
 {
+
+    fun getPopularPostList()
+    : List<PopularPostResponse>
+    {
+        val popularPosts = postRepository.findTop10ByIsDeletedFalseOrderByViewsDesc()
+        return popularPosts.map { PopularPostResponse.from(it) }
+    }
+
+
+
     fun getPostList(
         page: Int,
         size: Int,

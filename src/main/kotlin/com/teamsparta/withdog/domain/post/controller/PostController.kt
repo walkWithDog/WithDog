@@ -1,6 +1,7 @@
 package com.teamsparta.withdog.domain.post.controller
 
 import com.teamsparta.withdog.domain.post.dto.PageResponse
+import com.teamsparta.withdog.domain.post.dto.PopularPostResponse
 import com.teamsparta.withdog.domain.post.dto.PostRequest
 import com.teamsparta.withdog.domain.post.dto.PostResponse
 import com.teamsparta.withdog.domain.post.service.PostService
@@ -18,6 +19,20 @@ class PostController(
     private val postService: PostService
 )
 {
+
+
+    @GetMapping("/popular")
+    fun getPopularList()
+    :ResponseEntity<List<PopularPostResponse>>
+    {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(postService.getPopularPostList())
+    }
+
+
+
+
     @GetMapping
     fun getPostList(
         @RequestParam("page", defaultValue = "0") page: Int,

@@ -54,4 +54,13 @@ class PostRepositoryImpl: CustomPostRepository, QueryDslSupport()
             )
         }.toTypedArray()
     }
+
+    override fun findTop10ByIsDeletedFalseOrderByViewsDesc(): List<Post> {
+        return queryFactory.selectFrom(post)
+            .where(post.isDeleted.isFalse)
+            .orderBy(post.views.desc())
+            .limit(10)
+            .fetch()
+    }
+
 }
