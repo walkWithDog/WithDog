@@ -4,6 +4,7 @@ import jakarta.persistence.*
 
 
 @Entity
+@Table(name = "users")
 class User(
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,5 +17,5 @@ class User(
     val password: String,
 
     @Column(name = "nickname", nullable = false)
-    var nickname: String
+    var nickname: String,
 )
