@@ -1,7 +1,6 @@
 package com.teamsparta.withdog.domain.post.dto
 
 import com.teamsparta.withdog.domain.comment.dto.CommentResponse
-import com.teamsparta.withdog.domain.comment.model.Comment
 import com.teamsparta.withdog.domain.post.model.Post
 import java.time.LocalDateTime
 
@@ -29,7 +28,7 @@ data class PostResponse(
                 post.title,
                 post.breedName,
                 post.content,
-                post.user.nickname,
+                post.user.profile.nickname,
                 post.imageUrl,
                 post.likes.size,
                 post.createdAt,

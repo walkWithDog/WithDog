@@ -130,4 +130,17 @@ class GlobalExceptionHandler
             .status(HttpStatus.UNAUTHORIZED)
             .body(ErrorResponse(message = e.message))
     }
+
+    @ExceptionHandler(PasswordInvalidException::class)
+    fun handlePasswordInvalidException(
+        e: PasswordInvalidException
+    ): ResponseEntity<ErrorResponse>
+    {
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(ErrorResponse(message = e.message))
+    }
 }
+
+
+

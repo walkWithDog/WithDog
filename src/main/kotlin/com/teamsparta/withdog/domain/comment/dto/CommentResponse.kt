@@ -19,7 +19,7 @@ data class CommentResponse(
             return CommentResponse(
                 id = comment.id ?: throw IllegalStateException("Comment Id cannot be null"),
                 content = comment.content,
-                nickname = comment.user.nickname,
+                nickname = comment.user.profile.nickname,
                 createAt = comment.createdAt,
                 updatedAt = comment.updatedAt,
             )

@@ -50,7 +50,7 @@ class S3Service(
     private fun validateFileExtension(fileName: String): String {
         val extensionIndex = fileName.lastIndexOf('.')
 
-        val extension = fileName.substring(extensionIndex + 1).toLowerCase()
+        val extension = fileName.substring(extensionIndex + 1).lowercase()
         val allowedExtensionList = arrayOf("jpg", "jpeg", "png", "gif")
 
         if (!allowedExtensionList.contains(extension)) {
