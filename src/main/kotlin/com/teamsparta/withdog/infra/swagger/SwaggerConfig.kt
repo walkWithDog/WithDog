@@ -34,9 +34,9 @@ class SwaggerConfig
             )
             .info(
                 Info()
-                    .title("Course API")
-                    .description("Course API schema")
-                    .version("1.0.0")
+                    .title("WithDog API")
+                    .description("WithDog API schema")
+                    .version("0.0.1")
             )
     }
 }
