@@ -1,7 +1,6 @@
 package com.teamsparta.withdog.domain.post.dto
 
 import com.teamsparta.withdog.domain.comment.dto.CommentResponse
-import com.teamsparta.withdog.domain.comment.model.Comment
 import com.teamsparta.withdog.domain.post.model.Post
 import java.time.LocalDateTime
 
