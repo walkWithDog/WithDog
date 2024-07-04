@@ -29,7 +29,7 @@ data class PostResponse(
                 post.title,
                 post.breedName,
                 post.content,
-                post.user.nickname,
+                post.user.profile.nickname,
                 post.imageUrl,
                 post.likes.size,
                 post.createdAt,
