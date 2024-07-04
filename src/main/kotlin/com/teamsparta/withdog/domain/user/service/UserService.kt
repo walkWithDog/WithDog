@@ -1,10 +1,10 @@
 package com.teamsparta.withdog.domain.user.service
 
-import com.teamsparta.withdog.domain.exception.*
 import com.teamsparta.withdog.domain.user.dto.*
 import com.teamsparta.withdog.domain.user.model.User
 import com.teamsparta.withdog.domain.user.model.UserProfile
 import com.teamsparta.withdog.domain.user.repository.UserRepository
+import com.teamsparta.withdog.global.exception.*
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -67,7 +67,7 @@ class UserService(
     ): UserResponse
     {
 
-        val user = userRepository.findByIdOrNull(userId) ?: throw ModelNotFoundException("User", userId)
+        val user = userRepository.findByIdOrNull(userId) ?: throw ModelNotFoundException("User")
         if (userUpdateProfileRequest.password != userUpdateProfileRequest.passwordConfirmation) throw PasswordInvalidException()
 
         val password = userUpdateProfileRequest.password
@@ -78,7 +78,7 @@ class UserService(
     }
 
     fun getProfileById(userId: Long): UserResponse {
-        val user = userRepository.findByIdOrNull(userId) ?: throw ModelNotFoundException("User", userId)
+        val user = userRepository.findByIdOrNull(userId) ?: throw ModelNotFoundException("User")
 
         return UserResponse.from(user)
     }
