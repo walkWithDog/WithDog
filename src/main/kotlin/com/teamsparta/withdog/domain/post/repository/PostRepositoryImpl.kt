@@ -80,4 +80,5 @@ class PostRepositoryImpl: CustomPostRepository, QueryDslSupport() {
 
         return PageImpl(contents, pageable, totalCount)
     }
+
 }
