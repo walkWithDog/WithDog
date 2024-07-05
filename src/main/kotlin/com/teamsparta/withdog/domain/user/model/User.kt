@@ -2,13 +2,15 @@ package com.teamsparta.withdog.domain.user.model
 
 import com.teamsparta.withdog.domain.user.dto.UserUpdateProfileRequest
 import jakarta.persistence.*
+import org.springframework.security.crypto.password.PasswordEncoder
 
 
 @Entity
 @Table(name = "users")
 class User(
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
 
     @Column(name = "username", nullable = false)
@@ -25,10 +27,13 @@ class User(
     val role: UserRole = UserRole.USER
 )
 {
-    fun updateProfile(userUpdateProfileRequest: UserUpdateProfileRequest, password: String)
+    fun updateProfile(
+        userUpdateProfileRequest: UserUpdateProfileRequest,
+        passwordEncoder: PasswordEncoder
+    )
     {
-        this.password = password
-        this.profile.nickname = userUpdateProfileRequest.nickname
+        password = passwordEncoder.encode(userUpdateProfileRequest.password)
+        profile.nickname = userUpdateProfileRequest.nickname
     }
 }
 
