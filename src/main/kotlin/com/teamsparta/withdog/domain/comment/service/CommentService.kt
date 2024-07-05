@@ -2,6 +2,7 @@ package com.teamsparta.withdog.domain.comment.service
 
 import com.teamsparta.withdog.domain.comment.dto.CommentRequest
 import com.teamsparta.withdog.domain.comment.dto.CommentResponse
+import com.teamsparta.withdog.domain.comment.dto.toEntity
 import com.teamsparta.withdog.domain.comment.repository.CommentRepository
 import com.teamsparta.withdog.domain.post.repository.PostRepository
 import com.teamsparta.withdog.domain.user.repository.UserRepository
