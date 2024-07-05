@@ -20,20 +20,29 @@ import org.springframework.web.multipart.MultipartFile
 class PostController(
     private val postService: PostService,
     private val viewCount: ViewCount,
-)
-{
+) {
+
+    @GetMapping("/keyword")
+    fun getPostListByKeyword(
+        @RequestParam("page", defaultValue = "0") page: Int,
+        @RequestParam("size", defaultValue = "10") size: Int,
+        @RequestParam("sort_by", defaultValue = "createdAt") sortBy: String,
+        @RequestParam("sort_direction", defaultValue = "desc") direction: String,
+        @RequestParam("keyword", defaultValue = "") keyword: String,
+    ): ResponseEntity<PageResponse<PostResponse>>{
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(postService.getPostByKeyword(page, size, sortBy, direction,keyword))
+    }
 
 
     @GetMapping("/popular")
     fun getPopularList()
-    :ResponseEntity<List<PopularPostResponse>>
-    {
+            : ResponseEntity<List<PopularPostResponse>> {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(postService.getPopularPostList())
     }
-
-
 
 
     @GetMapping
@@ -42,8 +51,7 @@ class PostController(
         @RequestParam("size", defaultValue = "10") size: Int,
         @RequestParam("sort_by", defaultValue = "createdAt") sortBy: String,
         @RequestParam("sort_direction", defaultValue = "desc") direction: String,
-    ): ResponseEntity<PageResponse<PostResponse>>
-    {
+    ): ResponseEntity<PageResponse<PostResponse>> {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(postService.getPostList(page, size, sortBy, direction))
@@ -52,9 +60,8 @@ class PostController(
     @GetMapping("/{postId}")
     fun getPostById(
         @PathVariable postId: Long
-    ): ResponseEntity<PostResponse>
-    {
-        val getPost= postService.getPostById(postId)
+    ): ResponseEntity<PostResponse> {
+        val getPost = postService.getPostById(postId)
         viewCount.incrementViewCount(postId)
         return ResponseEntity
             .status(HttpStatus.OK)
@@ -66,8 +73,7 @@ class PostController(
         @AuthenticationPrincipal principal: UserPrincipal,
         @Valid @RequestPart("request") postRequest: PostRequest,
         @RequestPart("image", required = false) image: MultipartFile?
-    ): ResponseEntity<PostResponse>
-    {
+    ): ResponseEntity<PostResponse> {
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(postService.createPost(principal.id, postRequest, image))
@@ -79,8 +85,7 @@ class PostController(
         @AuthenticationPrincipal principal: UserPrincipal,
         @Valid @RequestPart("request") postRequest: PostRequest,
         @RequestPart("image", required = false) image: MultipartFile?
-    ): ResponseEntity<PostResponse>
-    {
+    ): ResponseEntity<PostResponse> {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(postService.updatePost(postId, principal.id, postRequest, image))
@@ -90,8 +95,7 @@ class PostController(
     fun deletePost(
         @PathVariable postId: Long,
         @AuthenticationPrincipal principal: UserPrincipal
-    ): ResponseEntity<Unit>
-    {
+    ): ResponseEntity<Unit> {
         return ResponseEntity
             .status(HttpStatus.NO_CONTENT)
             .body(postService.deletePost(postId, principal.id))

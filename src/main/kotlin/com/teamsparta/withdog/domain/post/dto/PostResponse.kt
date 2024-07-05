@@ -15,7 +15,8 @@ data class PostResponse(
     val likes: Int,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime?,
-    val comments: List<CommentResponse>?
+    val comments: List<CommentResponse>?,
+    val views: Long,
 ): Serializable
 {
     companion object{
@@ -34,7 +35,8 @@ data class PostResponse(
                 post.likes.size,
                 post.createdAt,
                 post.updatedAt,
-                comment
+                comment,
+                post.views
             )
         }
     }

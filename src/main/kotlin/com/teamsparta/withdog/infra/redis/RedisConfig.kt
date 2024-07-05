@@ -48,7 +48,7 @@ class RedisConfig {
     @Bean
     fun cacheManager(redisConnectionFactory: RedisConnectionFactory): CacheManager {
         val redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
-            .entryTtl(Duration.ofHours(1)) // 캐시 만료 시간 설정,요것은 TTL 설정
+            .entryTtl(Duration.ofHours(1)) // TTL을 1시간으로 설정한 이유는 인기 검색어 목록을 1시간 간격으로 업데이트하기위함
             .disableCachingNullValues()
 
         return RedisCacheManager.builder(redisConnectionFactory)

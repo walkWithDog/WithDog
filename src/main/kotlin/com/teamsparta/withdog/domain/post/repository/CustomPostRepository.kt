@@ -10,4 +10,6 @@ interface CustomPostRepository
 
     fun findTop10ByIsDeletedFalseOrderByViewsDesc(): List<Post>
 
+    fun findByKeyword(pageable: Pageable,keyword: String): Page<Post>
+
 }

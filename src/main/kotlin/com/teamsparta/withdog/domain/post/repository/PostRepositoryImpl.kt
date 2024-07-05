@@ -15,14 +15,12 @@ import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
 
 @Repository
-class PostRepositoryImpl: CustomPostRepository, QueryDslSupport()
-{
+class PostRepositoryImpl: CustomPostRepository, QueryDslSupport() {
     private val post = QPost.post
 
     override fun findByIsDeletedFalseAndPageable(
         pageable: Pageable
-    ): Page<Post>
-    {
+    ): Page<Post> {
         val whereClause = BooleanBuilder()
 
         val totalCount = queryFactory.select(post.count())
@@ -43,8 +41,7 @@ class PostRepositoryImpl: CustomPostRepository, QueryDslSupport()
     private fun getOrderSpecifier(
         pageable: Pageable,
         path: EntityPathBase<*>
-    ): Array<OrderSpecifier<*>>
-    {
+    ): Array<OrderSpecifier<*>> {
         val pathBuilder = PathBuilder(path.type, path.metadata)
 
         return pageable.sort.toList().map { order ->
@@ -63,4 +60,24 @@ class PostRepositoryImpl: CustomPostRepository, QueryDslSupport()
             .fetch()
     }
 
+    override fun findByKeyword(pageable: Pageable, keyword: String): Page<Post> {
+        val whereClause = BooleanBuilder()
+        whereClause.and(post.title.containsIgnoreCase(keyword)
+            .or(post.content.containsIgnoreCase(keyword)))
+            .or(post.breedName.containsIgnoreCase(keyword))
+
+        val totalCount = queryFactory.select(post.count())
+            .from(post)
+            .where(whereClause)
+            .fetchCount()
+
+        val contents = queryFactory.selectFrom(post)
+            .where(whereClause)
+            .offset(pageable.offset)
+            .limit(pageable.pageSize.toLong())
+            .orderBy(*getOrderSpecifier(pageable, post))
+            .fetch()
+
+        return PageImpl(contents, pageable, totalCount)
+    }
 }

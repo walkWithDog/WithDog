@@ -3,7 +3,7 @@ package com.teamsparta.withdog.domain.post.service
 import com.teamsparta.withdog.domain.comment.service.CommentService
 import com.teamsparta.withdog.domain.like.service.LikeService
 import com.teamsparta.withdog.domain.post.dto.*
-import com.teamsparta.withdog.domain.post.model.Post
+
 import com.teamsparta.withdog.domain.post.repository.PostRepository
 import com.teamsparta.withdog.domain.user.repository.UserRepository
 import com.teamsparta.withdog.global.exception.ModelNotFoundException
@@ -17,7 +17,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.scheduling.annotation.Scheduled
+
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
@@ -69,6 +69,18 @@ class PostService(
         viewCount.incrementViewCount(postId) // 조회수 증가
         return PostResponse.from(post, commentService.getCommentList(postId))
     }
+
+    fun getPostByKeyword(page: Int, size: Int, sortBy: String, direction: String, keyword: String): PageResponse<PostResponse> {
+        val direction = getDirection(direction)
+        val pageable: Pageable = PageRequest.of(page, size, direction, sortBy)
+        val pageContent = postRepository.findByKeyword(pageable, keyword)
+        return PageResponse(pageContent.content.map { PostResponse.from(it, commentService.getCommentList(it.id!!)) },page, size)
+
+    }
+
+
+
+
 
 
 
@@ -151,4 +163,6 @@ class PostService(
         "asc" -> Sort.Direction.ASC
         else -> Sort.Direction.DESC
     }
+
+
 }
