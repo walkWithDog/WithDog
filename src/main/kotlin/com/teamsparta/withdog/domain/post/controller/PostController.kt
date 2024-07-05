@@ -7,8 +7,8 @@ import com.teamsparta.withdog.domain.post.service.PostService
 import com.teamsparta.withdog.infra.security.jwt.UserPrincipal
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -42,7 +42,10 @@ class PostController(
             .body(postService.getPostById(postId))
     }
 
-    @PostMapping
+    @PostMapping(
+        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE],
+        produces = [MediaType.APPLICATION_JSON_VALUE]
+    )
     fun createPost(
         @AuthenticationPrincipal principal: UserPrincipal,
         @Valid @RequestPart("request") postRequest: PostRequest,
@@ -54,7 +57,11 @@ class PostController(
             .body(postService.createPost(principal.id, postRequest, image))
     }
 
-    @PutMapping("/{postId}")
+    @PutMapping(
+        value = ["/{postId}"],
+        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE],
+        produces = [MediaType.APPLICATION_JSON_VALUE]
+    )
     fun updatePost(
         @PathVariable postId: Long,
         @AuthenticationPrincipal principal: UserPrincipal,
@@ -82,7 +89,8 @@ class PostController(
     fun postLike(
         @PathVariable postId: Long,
         @AuthenticationPrincipal principal: UserPrincipal
-    ): ResponseEntity<Unit> {
+    ): ResponseEntity<Unit>
+    {
         postService.postLike(postId, principal.id)
 
         return ResponseEntity

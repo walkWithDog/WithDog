@@ -9,16 +9,15 @@ data class CommentRequest(
     @field:NotBlank
     val content: String
 )
+
+fun CommentRequest.toEntity(
+    user: User,
+    post: Post
+): Comment
 {
-    fun toEntity(
-        user: User,
-        post: Post
-    ): Comment
-    {
-        return Comment(
-            content = this.content,
-            user = user,
-            post = post
-        )
-    }
+    return Comment(
+        content = this.content,
+        user = user,
+        post = post
+    )
 }
