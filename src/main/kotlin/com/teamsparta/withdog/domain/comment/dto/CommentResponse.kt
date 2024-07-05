@@ -1,6 +1,7 @@
 package com.teamsparta.withdog.domain.comment.dto
 
 import com.teamsparta.withdog.domain.comment.model.Comment
+import java.io.Serializable
 import java.time.LocalDateTime
 
 data class CommentResponse(
@@ -9,7 +10,7 @@ data class CommentResponse(
     val nickname: String,
     val createAt: LocalDateTime,
     val updatedAt: LocalDateTime?,
-)
+): Serializable
 {
     companion object {
         fun from(

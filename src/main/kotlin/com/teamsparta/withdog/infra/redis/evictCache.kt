@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 
 
 @Component
-class evictCache {
+class EvictCache {
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
 

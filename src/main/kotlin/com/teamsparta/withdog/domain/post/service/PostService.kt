@@ -8,8 +8,8 @@ import com.teamsparta.withdog.domain.post.repository.PostRepository
 import com.teamsparta.withdog.domain.user.repository.UserRepository
 import com.teamsparta.withdog.global.exception.ModelNotFoundException
 import com.teamsparta.withdog.global.exception.UnauthorizedException
+import com.teamsparta.withdog.infra.redis.EvictCache
 import com.teamsparta.withdog.infra.redis.ViewCount
-import com.teamsparta.withdog.infra.redis.evictCache
 import com.teamsparta.withdog.infra.s3.S3Service
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CacheEvict
@@ -33,7 +33,8 @@ class PostService(
     private val likeService: LikeService,
     private val commentService: CommentService,
     private val viewCount: ViewCount,
-    private val evictCache: evictCache,
+    private val evictCache: EvictCache,
+
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -86,6 +87,7 @@ class PostService(
         val direction = getDirection(direction)
         val pageable: Pageable = PageRequest.of(page, size, direction, sortBy)
         val pageContent = postRepository.findByKeyword(pageable, keyword)
+
         return PageResponse(
             pageContent.content.map { PostResponse.from(it, commentService.getCommentList(it.id!!)) },
             page,
@@ -106,17 +108,10 @@ class PostService(
             ?: throw ModelNotFoundException("없는 사용자 입니다.")
         val fileUrl = image?.let { s3Service.upload(it) }
 
-//        evictKeyword(postRequest.breedName) // 요런식으로 새로운 게시글이 생성될때마다 기존의 키워드 캐시를 삭제함으로써 데이터정합성을 지킬수 있음
         return PostResponse.from(postRepository.save(postRequest.toEntity(user, fileUrl)), null)
     }
 
 
-//    @Caching(evict = [
-//        CacheEvict(value = ["keywordPostCache"],key = "#breedName")
-//    ])
-//    fun evictKeyword(breedName: String){
-//        logger.info("해당 견종 캐시 삭제 : $breedName")
-//    }
 
     @CachePut(value = ["postCache"], key = "#postId")
     @Transactional
@@ -170,10 +165,6 @@ class PostService(
 
     }
 
-    @CacheEvict( value = ["keywordPostCache"], key ="#breedName")
-    fun evictCaches(postId: Long, breedName: String?){
-        if(breedName != null)  logger.info("해당 견종 캐시 삭제 : $breedName")
-    }
 
 
     fun postLike(
@@ -193,6 +184,7 @@ class PostService(
         "asc" -> Sort.Direction.ASC
         else -> Sort.Direction.DESC
     }
+
 
 
 }

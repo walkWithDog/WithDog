@@ -22,6 +22,7 @@ class PostController(
     private val viewCount: ViewCount,
 ) {
 
+
     @GetMapping("/keyword")
     fun getPostListByKeyword(
         @RequestParam("page", defaultValue = "0") page: Int,
