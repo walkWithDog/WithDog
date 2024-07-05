@@ -17,7 +17,7 @@ class JwtPlugin(
 )
 {
     var now = Date()
-    val accessExpiration = Date(now.time + accessTokenExpirationHour)
+    val accessExpiration = Date(now.time + accessTokenExpirationHour * 3600 * 1000)
     val key = Keys.hmacShaKeyFor(secret.toByteArray(StandardCharsets.UTF_8))
 
 

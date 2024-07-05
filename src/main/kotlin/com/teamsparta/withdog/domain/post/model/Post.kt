@@ -34,6 +34,9 @@ class Post(
     @JoinColumn(name = "user_id")
     val user: User,
 
+    @Column(name= "view")
+    var views: Long =0,
+
     @OneToMany(mappedBy = "post", cascade = [CascadeType.ALL], orphanRemoval = true)
     val likes: MutableList<Like> = mutableListOf()
 )

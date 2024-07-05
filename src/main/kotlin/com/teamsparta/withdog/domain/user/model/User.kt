@@ -4,6 +4,7 @@ import com.teamsparta.withdog.domain.user.dto.UserUpdateProfileRequest
 import jakarta.persistence.*
 import org.springframework.security.crypto.password.PasswordEncoder
 
+
 @Entity
 @Table(name = "users")
 class User(

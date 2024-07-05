@@ -36,7 +36,8 @@ class SecurityConfig(
                     "/api/v1/users/signup",
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
-                    "/error"
+                    "/error",
+                    "/api/v1/users/**",
                 ).permitAll()
                     .anyRequest().authenticated()
             }
