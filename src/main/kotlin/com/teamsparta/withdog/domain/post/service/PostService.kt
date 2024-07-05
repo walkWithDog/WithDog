@@ -8,6 +8,7 @@ import com.teamsparta.withdog.domain.post.repository.PostRepository
 import com.teamsparta.withdog.domain.user.repository.UserRepository
 import com.teamsparta.withdog.global.exception.ModelNotFoundException
 import com.teamsparta.withdog.global.exception.UnauthorizedException
+import com.teamsparta.withdog.infra.redis.ViewCount
 import com.teamsparta.withdog.infra.s3.S3Service
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.CachePut
@@ -16,7 +17,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.http.ResponseEntity
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
@@ -27,12 +28,13 @@ class PostService(
     private val userRepository: UserRepository,
     private val s3Service: S3Service,
     private val likeService: LikeService,
-    private val commentService: CommentService
+    private val commentService: CommentService,
+    private val viewCount: ViewCount,
 )
 {
 
 
-    @Cacheable(value = ["popularPostCache"], key = "'getPopularPostList'") // 심히 테스트가 필요한 대목
+    @Cacheable(value = ["popularPostCache"], key = "'getPopularPostList'") // 인기검색어 목록은 1시간마다 갱신됨
     fun getPopularPostList()
     : List<PopularPostResponse>
     {
@@ -58,18 +60,17 @@ class PostService(
     }
 
     @Cacheable(value = ["postCache"], key = "#postId")
-    fun getPostById(
-        postId: Long
-    ): PostResponse
-    {
+    fun getPostById(postId: Long): PostResponse {
         val post = postRepository.findByIdOrNull(postId)
             ?: throw ModelNotFoundException("삭제된 게시글 입니다.")
         if (post.isDeleted) throw ModelNotFoundException("삭제된 게시글 입니다.")
 
-        post.views +=1
-        postRepository.save(post) // TODO() 컨트롤러에서 증가시켜볼까
+
+        viewCount.incrementViewCount(postId) // 조회수 증가
         return PostResponse.from(post, commentService.getCommentList(postId))
     }
+
+
 
     @Transactional
     fun createPost(

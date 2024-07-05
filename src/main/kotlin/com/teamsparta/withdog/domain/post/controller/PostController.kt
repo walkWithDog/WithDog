@@ -5,6 +5,7 @@ import com.teamsparta.withdog.domain.post.dto.PopularPostResponse
 import com.teamsparta.withdog.domain.post.dto.PostRequest
 import com.teamsparta.withdog.domain.post.dto.PostResponse
 import com.teamsparta.withdog.domain.post.service.PostService
+import com.teamsparta.withdog.infra.redis.ViewCount
 import com.teamsparta.withdog.infra.security.jwt.UserPrincipal
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
@@ -17,7 +18,8 @@ import org.springframework.web.multipart.MultipartFile
 @RestController
 @RequestMapping("/api/v1/posts")
 class PostController(
-    private val postService: PostService
+    private val postService: PostService,
+    private val viewCount: ViewCount,
 )
 {
 
@@ -52,9 +54,11 @@ class PostController(
         @PathVariable postId: Long
     ): ResponseEntity<PostResponse>
     {
+        val getPost= postService.getPostById(postId)
+        viewCount.incrementViewCount(postId)
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(postService.getPostById(postId))
+            .body(getPost)
     }
 
     @PostMapping

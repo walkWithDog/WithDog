@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
+import java.time.Duration
 
 @EnableCaching
 @Configuration
@@ -47,7 +48,7 @@ class RedisConfig {
     @Bean
     fun cacheManager(redisConnectionFactory: RedisConnectionFactory): CacheManager {
         val redisCacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
-//            .entryTtl(Duration.ofHours(1)) // 캐시 만료 시간 설정,요것은 TTL 설정
+            .entryTtl(Duration.ofHours(1)) // 캐시 만료 시간 설정,요것은 TTL 설정
             .disableCachingNullValues()
 
         return RedisCacheManager.builder(redisConnectionFactory)
