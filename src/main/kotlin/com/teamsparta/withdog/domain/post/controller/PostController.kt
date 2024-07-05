@@ -9,7 +9,6 @@ import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -58,7 +57,8 @@ class PostController(
             .body(postService.createPost(principal.id, postRequest, image))
     }
 
-    @PutMapping(value = ["/{postId}"],
+    @PutMapping(
+        value = ["/{postId}"],
         consumes = [MediaType.MULTIPART_FORM_DATA_VALUE],
         produces = [MediaType.APPLICATION_JSON_VALUE]
     )
@@ -89,7 +89,8 @@ class PostController(
     fun postLike(
         @PathVariable postId: Long,
         @AuthenticationPrincipal principal: UserPrincipal
-    ): ResponseEntity<Unit> {
+    ): ResponseEntity<Unit>
+    {
         postService.postLike(postId, principal.id)
 
         return ResponseEntity

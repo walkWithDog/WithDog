@@ -1,7 +1,11 @@
 package com.teamsparta.withdog.domain.user.dto
 
-data class UserUpdateProfileRequest (
-    val password : String,
-    val passwordConfirmation : String,
-    var nickname : String
+import jakarta.validation.constraints.NotBlank
+
+data class UserUpdateProfileRequest(
+    val password: String,
+    val passwordConfirmation: String,
+
+    @field:NotBlank
+    var nickname: String
 )
