@@ -63,7 +63,7 @@ class PostRepositoryImpl: CustomPostRepository, QueryDslSupport() {
     override fun findByKeyword(pageable: Pageable, keyword: String): Page<Post> {
         val whereClause = BooleanBuilder()
         whereClause.and(post.title.containsIgnoreCase(keyword)
-            .or(post.content.containsIgnoreCase(keyword)))
+            .or(post.content.containsIgnoreCase(keyword)))// LIKE %keyword%
             .or(post.breedName.containsIgnoreCase(keyword))
 
         val totalCount = queryFactory.select(post.count())

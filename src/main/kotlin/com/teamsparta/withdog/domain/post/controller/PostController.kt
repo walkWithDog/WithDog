@@ -23,7 +23,7 @@ class PostController(
 ) {
 
 
-    @GetMapping("/keyword")
+    @GetMapping("/redis/keyword")
     fun getPostListByKeyword(
         @RequestParam("page", defaultValue = "0") page: Int,
         @RequestParam("size", defaultValue = "10") size: Int,
@@ -35,6 +35,31 @@ class PostController(
             .status(HttpStatus.OK)
             .body(postService.getPostByKeyword(page, size, sortBy, direction,keyword))
     }
+
+    @GetMapping("/no-cache/keyword")
+    fun getPostListByKeywordNoCache(
+        @RequestParam("page", defaultValue = "0") page: Int,
+        @RequestParam("size", defaultValue = "10") size: Int,
+        @RequestParam("sort_by", defaultValue = "createdAt") sortBy: String,
+        @RequestParam("sort_direction", defaultValue = "desc") direction: String,
+        @RequestParam("keyword", defaultValue = "") keyword: String,
+    ): ResponseEntity<PageResponse<PostResponse>>{
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(postService.getPostByKeywordNoCache(page, size, sortBy, direction,keyword))
+    }
+
+
+    @GetMapping("/popular/keyword-list")
+    fun getPopularKeywordList()
+    {
+        postService.getPopularKeywordList()
+
+    }
+
+
+
+
 
 
     @GetMapping("/popular")

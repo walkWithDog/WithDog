@@ -96,6 +96,27 @@ class PostService(
 
     }
 
+    fun getPostByKeywordNoCache(
+        page: Int,
+        size: Int,
+        sortBy: String,
+        direction: String,
+        keyword: String
+    ): PageResponse<PostResponse> {
+        val direction = getDirection(direction)
+        val pageable: Pageable = PageRequest.of(page, size, direction, sortBy)
+        val pageContent = postRepository.findByKeyword(pageable, keyword)
+
+        return PageResponse(
+            pageContent.content.map { PostResponse.from(it, commentService.getCommentList(it.id!!)) },
+            page,
+            size
+        )
+    }
+
+
+
+
 
     @CacheEvict(value = ["keywordPostCache"], key = "#postRequest.breedName")
     @Transactional
@@ -185,6 +206,9 @@ class PostService(
         else -> Sort.Direction.DESC
     }
 
+    fun getPopularKeywordList() {
+
+    }
 
 
 }
