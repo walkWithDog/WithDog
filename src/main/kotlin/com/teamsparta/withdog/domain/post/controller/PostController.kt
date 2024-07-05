@@ -52,9 +52,11 @@ class PostController(
 
     @GetMapping("/popular/keyword-list")
     fun getPopularKeywordList()
+    :ResponseEntity<List<String>>
     {
-        postService.getPopularKeywordList()
-
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(postService.getPopularKeywordList())
     }
 
 

@@ -81,4 +81,18 @@ class PostRepositoryImpl: CustomPostRepository, QueryDslSupport() {
         return PageImpl(contents, pageable, totalCount)
     }
 
+    override fun findPopularKeywords(): List<String> {
+
+        val qPost = QPost.post
+
+        return queryFactory.select(qPost.breedName)
+            .from(qPost)
+            .where(qPost.isDeleted.isFalse)
+            .groupBy(qPost.breedName)
+            .orderBy(qPost.breedName.count().desc())
+            .limit(10)
+            .fetch()
+
+    }
+
 }

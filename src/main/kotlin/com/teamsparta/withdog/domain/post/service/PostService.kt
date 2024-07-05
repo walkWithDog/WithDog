@@ -206,8 +206,9 @@ class PostService(
         else -> Sort.Direction.DESC
     }
 
-    fun getPopularKeywordList() {
-
+    fun getPopularKeywordList()
+    :List<String> {
+        return postRepository.findPopularKeywords()
     }
 
 

@@ -12,5 +12,7 @@ interface CustomPostRepository
 
     fun findByKeyword(pageable: Pageable,keyword: String): Page<Post>
 
+    fun findPopularKeywords(): List<String>
+
 
 }
