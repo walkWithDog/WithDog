@@ -1,8 +1,6 @@
 package com.teamsparta.withdog.domain.user.service
 
 import com.teamsparta.withdog.domain.user.dto.*
-import com.teamsparta.withdog.domain.user.model.User
-import com.teamsparta.withdog.domain.user.model.UserProfile
 import com.teamsparta.withdog.domain.user.model.UserRole
 import com.teamsparta.withdog.domain.user.repository.UserRepository
 import com.teamsparta.withdog.global.exception.*
@@ -13,13 +11,13 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.regex.Pattern
 
-
 @Service
 class UserService(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
     private val jwtPlugin: JwtPlugin
-) {
+)
+{
     @Transactional
     fun signUp(
         userSignUpRequest: UserSignUpRequest
@@ -32,20 +30,9 @@ class UserService(
         validateNickname(nickname)
 
         if (userRepository.existsByUsername(userSignUpRequest.username))
-        {
             throw UsernameDuplicateException()
-        }
 
-       val user = User(
-           username = userSignUpRequest.username,
-           password = passwordEncoder.encode(userSignUpRequest.password),
-           profile = UserProfile(userSignUpRequest.username),
-           role = UserRole.USER
-       )
-
-        val savedUser = userRepository.save(user)
-
-        return UserResponse.from(savedUser)
+        return UserResponse.from(userRepository.save(userSignUpRequest.toEntity(passwordEncoder)))
     }
 
 
@@ -59,16 +46,12 @@ class UserService(
 
         if (user.username != userLogInRequest.username ||
             !passwordEncoder.matches(userLogInRequest.password, user.password))
-
-        {
             throw LoginValidationException()
-        }
 
         val token = jwtPlugin.generateAccessToken(
             subject = user.id.toString(),
             username = user.username,
             role = UserRole.USER.toString()
-
         )
 
         return UserResponse.from(user, token)
@@ -76,22 +59,26 @@ class UserService(
 
     @Transactional
     fun updateProfile(
-        userUpdateProfileRequest: UserUpdateProfileRequest, userId : Long
+        userUpdateProfileRequest: UserUpdateProfileRequest,
+        userId: Long
     ): UserResponse
     {
+        val user = userRepository.findByIdOrNull(userId)
+            ?: throw ModelNotFoundException("없는 사용자 입니다.")
+        if (userUpdateProfileRequest.password != userUpdateProfileRequest.passwordConfirmation)
+            throw PasswordInvalidException()
 
-        val user = userRepository.findByIdOrNull(userId) ?: throw ModelNotFoundException("User")
-        if (userUpdateProfileRequest.password != userUpdateProfileRequest.passwordConfirmation) throw PasswordInvalidException()
+        validatePassword(userUpdateProfileRequest.password, user.username)
 
-        val password = userUpdateProfileRequest.password
-        user.updateProfile(userUpdateProfileRequest, password)
+        user.updateProfile(userUpdateProfileRequest, passwordEncoder)
 
         return UserResponse.from(user)
-
     }
 
-    fun getProfileById(userId: Long): UserResponse {
-        val user = userRepository.findByIdOrNull(userId) ?: throw ModelNotFoundException("User")
+    fun getProfileById(userId: Long): UserResponse
+    {
+        val user = userRepository.findByIdOrNull(userId)
+            ?: throw ModelNotFoundException("없는 사용자 입니다.")
 
         return UserResponse.from(user)
     }
@@ -99,8 +86,8 @@ class UserService(
 
 private fun validateUsername(
     username: String
-) {
-
+)
+{
     if (!Pattern.matches(
             "^[a-zA-Z0-9]{3,10}$",
             username
@@ -112,9 +99,10 @@ private fun validateUsername(
 }
 
 private fun validatePassword(
-    password: String, username: String
-) {
-
+    password: String,
+    username: String
+)
+{
     if (!Pattern.matches(
             "^.{4,16}$",
             password
@@ -131,12 +119,13 @@ private fun validatePassword(
 
 private fun validateNickname(
     nickname: String
-) {
+)
+{
     if (!Pattern.matches(
-        "^[가-힣a-zA-Z0-9]{2,8}$",
-        nickname
-    )
+            "^[가-힣a-zA-Z0-9]{2,8}$",
+            nickname
         )
+    )
     {
         throw NicknameInvalidException()
     }
