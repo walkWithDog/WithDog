@@ -76,7 +76,7 @@ class PostService(
         return PostResponse.from(post, commentService.getCommentList(postId))
     }
 
-    @Cacheable(value = ["keywordPostCache"], key = "#keyword") //TODO() 여기 수정하자
+    @Cacheable(value = ["keywordPostCache"], key = "#keyword + '-' + #size + '-' + #page")
     fun getPostByKeyword(
         page: Int,
         size: Int,
@@ -115,7 +115,7 @@ class PostService(
     }
 
 
-    @CacheEvict(value = ["keywordPostCache"], key = "#postRequest.breedName")
+    @CacheEvict(value = ["keywordPostCache"], key = "#postRequest.breedName + '*'")
     @Transactional
     fun createPost(
         userId: Long,

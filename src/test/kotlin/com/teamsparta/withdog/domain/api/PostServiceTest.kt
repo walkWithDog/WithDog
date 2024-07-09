@@ -109,7 +109,7 @@ class PostServiceTest{
             direction= "desc",
             keyword= "해리포터"
         )
-        cacheManager.getCache("keywordPostCache")!!.get("해리포터") shouldNotBe null
+        cacheManager.getCache("keywordPostCache")!!.get("해리포터-10-0") shouldNotBe null
 
         //조회 했으니 캐시가 있어야 하며 create를 하면 캐시가 삭제되어야함
 
@@ -123,7 +123,7 @@ class PostServiceTest{
             )
         )
 
-        cacheManager.getCache("keywordPostCache")!!.get("해리포터") shouldBe null
+        cacheManager.getCache("keywordPostCache")!!.get("해리포터-10-0") shouldBe null
 
     }
 
