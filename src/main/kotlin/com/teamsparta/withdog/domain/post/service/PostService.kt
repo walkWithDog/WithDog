@@ -35,7 +35,7 @@ class PostService(
     private val viewCount: ViewCount,
     private val evictCache: EvictCache,
 
-) {
+    ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
 
@@ -76,7 +76,7 @@ class PostService(
         return PostResponse.from(post, commentService.getCommentList(postId))
     }
 
-    @Cacheable(value = ["keywordPostCache"], key = "#keyword")
+    @Cacheable(value = ["keywordPostCache"], key = "#keyword + '-' + #size + '-' + #page")
     fun getPostByKeyword(
         page: Int,
         size: Int,
@@ -115,10 +115,7 @@ class PostService(
     }
 
 
-
-
-
-    @CacheEvict(value = ["keywordPostCache"], key = "#postRequest.breedName")
+    @CacheEvict(value = ["keywordPostCache"], key = "#postRequest.breedName + '*'")
     @Transactional
     fun createPost(
         userId: Long,
@@ -131,7 +128,6 @@ class PostService(
 
         return PostResponse.from(postRepository.save(postRequest.toEntity(user, fileUrl)), null)
     }
-
 
 
     @CachePut(value = ["postCache"], key = "#postId")
@@ -187,7 +183,6 @@ class PostService(
     }
 
 
-
     fun postLike(
         postId: Long,
         userId: Long
@@ -207,7 +202,7 @@ class PostService(
     }
 
     fun getPopularKeywordList()
-    :List<String> {
+            : List<String> {
         return postRepository.findPopularKeywords()
     }
 

@@ -10,7 +10,7 @@ class EvictCache {
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
 
-    @CacheEvict( value = ["keywordPostCache"], key ="#breedName")
+    @CacheEvict( value = ["keywordPostCache"], key ="#breedName + '*' ")
     fun evictCaches(postId: Long, breedName: String){
         logger.info("해당 견종 캐시 삭제 : $breedName")
     }
