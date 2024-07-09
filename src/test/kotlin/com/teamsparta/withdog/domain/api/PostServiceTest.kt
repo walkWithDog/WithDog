@@ -12,6 +12,7 @@ import com.teamsparta.withdog.domain.user.service.UserService
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import jakarta.transaction.Transactional
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -61,6 +62,7 @@ class PostServiceTest{
 
     }
 
+    @Transactional
     @Test
     fun `캐시를 적용한 검색 api가 처음 조회했을때 캐시에 등록이 되는지 테스트 하는 함수`(){
 
