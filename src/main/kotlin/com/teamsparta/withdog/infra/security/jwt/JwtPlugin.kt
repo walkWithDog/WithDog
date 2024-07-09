@@ -22,7 +22,7 @@ class JwtPlugin(
 
 
     fun validateToken(
-        jwt: String
+        jwt: String?
     ): Result<Jws<Claims>>
     {
         return kotlin.runCatching {

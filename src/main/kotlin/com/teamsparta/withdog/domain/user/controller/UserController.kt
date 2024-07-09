@@ -6,6 +6,7 @@ import com.teamsparta.withdog.domain.user.dto.UserSignUpRequest
 import com.teamsparta.withdog.domain.user.dto.UserUpdateProfileRequest
 import com.teamsparta.withdog.domain.user.service.UserService
 import com.teamsparta.withdog.infra.security.jwt.UserPrincipal
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -57,5 +58,15 @@ class UserController(
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(userService.getProfileById(userId))
+    }
+
+    @PostMapping("/logout")
+    fun logout(
+        request: HttpServletRequest): ResponseEntity<Unit>
+    {
+        val token = request.getAttribute("accessToken") as String?
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(userService.logout(token!!))
     }
 }

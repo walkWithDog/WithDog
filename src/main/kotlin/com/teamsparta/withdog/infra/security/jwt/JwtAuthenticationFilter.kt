@@ -1,5 +1,6 @@
 package com.teamsparta.withdog.infra.security.jwt
 
+import com.teamsparta.withdog.domain.user.service.UserService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -12,9 +13,14 @@ import org.springframework.web.filter.OncePerRequestFilter
 
 @Component
 class JwtAuthenticationFilter(
-    private val jwtPlugin: JwtPlugin
+    private val jwtPlugin: JwtPlugin,
+    private val userService: UserService
 ) : OncePerRequestFilter()
 {
+    companion object {
+        private val BEARER_PATTERN = Regex("^Bearer (.+?)$")
+    }
+
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
@@ -23,6 +29,10 @@ class JwtAuthenticationFilter(
         val jwt = request.getBearerToken()
 
         if (jwt != null) {
+            if (userService.blackListToken(jwt)) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token is blacklisted")
+                return
+            }
             jwtPlugin.validateToken(jwt)
                 .onSuccess {
                     val userId = it.payload.subject.toLong()
@@ -38,14 +48,16 @@ class JwtAuthenticationFilter(
                         details = WebAuthenticationDetailsSource().buildDetails(request)
                     )
                     SecurityContextHolder.getContext().authentication = authentication
+                    request.setAttribute("accessToken", jwt)
                 }
-        }
+
 
         filterChain.doFilter(request, response)
+        }
     }
 
     private fun HttpServletRequest.getBearerToken(): String? {
         val headerValue = this.getHeader(HttpHeaders.AUTHORIZATION) ?: return null
-        return Regex("^Bearer (.+?)$").find(headerValue)?.groupValues?.get(1)
+        return BEARER_PATTERN.find(headerValue)?.groupValues?.get(1)
     }
 }

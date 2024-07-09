@@ -18,6 +18,8 @@ class UserService(
     private val jwtPlugin: JwtPlugin
 )
 {
+    private val tokenBlacklist = mutableSetOf<String>()
+
     @Transactional
     fun signUp(
         userSignUpRequest: UserSignUpRequest
@@ -81,6 +83,20 @@ class UserService(
             ?: throw ModelNotFoundException("없는 사용자 입니다.")
 
         return UserResponse.from(user)
+    }
+
+    fun logout(
+        token: String
+    )
+    {
+        tokenBlacklist.add(token)
+    }
+
+    fun blackListToken(
+        token: String
+    ): Boolean
+    {
+        return tokenBlacklist.contains(token)
     }
 }
 
