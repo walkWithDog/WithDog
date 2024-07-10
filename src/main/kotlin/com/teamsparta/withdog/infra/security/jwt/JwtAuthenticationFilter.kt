@@ -50,10 +50,10 @@ class JwtAuthenticationFilter(
                     SecurityContextHolder.getContext().authentication = authentication
                     request.setAttribute("accessToken", jwt)
                 }
-
+        }
 
         filterChain.doFilter(request, response)
-        }
+
     }
 
     private fun HttpServletRequest.getBearerToken(): String? {
