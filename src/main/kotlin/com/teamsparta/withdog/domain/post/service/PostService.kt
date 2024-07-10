@@ -115,7 +115,7 @@ class PostService(
     }
 
 
-    @CacheEvict(value = ["keywordPostCache"], key = "#postRequest.breedName + '*'")
+    @CacheEvict(value = ["keywordPostCache"], key = "#postRequest.breedName")
     @Transactional
     fun createPost(
         userId: Long,
@@ -125,6 +125,7 @@ class PostService(
         val user = userRepository.findByIdOrNull(userId)
             ?: throw ModelNotFoundException("없는 사용자 입니다.")
         val fileUrl = image?.let { s3Service.upload(it) }
+        evictCache.evictCaches(breedName = postRequest.breedName)
 
         return PostResponse.from(postRepository.save(postRequest.toEntity(user, fileUrl)), null)
     }
@@ -175,6 +176,7 @@ class PostService(
             throw UnauthorizedException("권한이 없습니다.")
 
         evictCache.evictCaches(breedName = post.breedName, postId = postId)
+        evictCache.evictCaches(breedName = post.breedName)
         post.imageUrl?.let { s3Service.delete(it.split("m/")[1]) }
         post.softDeleted()
         likeService.deleteLike(post)
