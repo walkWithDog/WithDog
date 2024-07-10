@@ -44,6 +44,7 @@ class PostServiceTest{
 
 
 
+    @Transactional
     @Test
     fun ` post를 생성하면 PopularKeywords 리스트에 해당 견종이름이 들어가는지 확인하는 테스트 함수   `(){
 
@@ -143,15 +144,93 @@ class PostServiceTest{
         cacheManager.getCache("keywordPostCache")!!.get("스타워즈") shouldBe null
 
         postService.getPostByKeywordNoCache(
-            page= 0,
-            size= 10,
+            page= 1,
+            size= 7,
             sortBy= "createdAt",
             direction= "desc",
             keyword= "스타워즈"
         )
 
-        cacheManager.getCache("keywordPostCache")!!.get("스타워즈") shouldBe null
+        cacheManager.getCache("keywordPostCache")!!.get("스타워즈-7-1") shouldBe null
 
+    }
+
+    @Transactional
+    @Test
+    fun `페이지네이션이 적용된 키워드 검색을 했을때  페이지네이션 캐시가 잘 저장되는지 테스트하는 함수`(){
+
+        postService.createPost(
+            image = null,
+            userId = 1,
+            postRequest = PostRequest(
+                title = "캐시 테스트코드용 제목",
+                content = "캐시 테스트 코드용 내용",
+                breedName = "티라노사우로스"
+            )
+        )
+
+        postService.getPostByKeyword(
+            page= 2,
+            size= 3,
+            sortBy= "createdAt",
+            direction= "desc",
+            keyword= "티라노사우로스"
+        )
+
+        cacheManager.getCache("keywordPostCache")!!.get("티라노사우로스-3-2") shouldNotBe null
+
+    }
+
+    @Transactional
+    @Test
+    fun `게시글을 삭제했을때 해당 게시글의 견종 관련 페이지네이션 캐시가 다 삭제가 되는지 테스트하는 함수`(){
+
+        val postResponse = postService.createPost(
+            image = null,
+            userId = 1,
+            postRequest = PostRequest(
+                title = "치와와 좋아요",
+                content = "안녕하세요 오늘은...",
+                breedName = "치와와"
+            )
+        )
+        val post = postRepository.findByIdOrNull(postResponse.id)!!
+        val postId = post.id!!
+
+        postService.getPostByKeyword(
+            page= 0,
+            size= 3,
+            sortBy= "createdAt",
+            direction= "desc",
+            keyword= "치와와"
+        )
+
+        postService.getPostByKeyword(
+            page= 0,
+            size= 2,
+            sortBy= "createdAt",
+            direction= "desc",
+            keyword= "치와와"
+        )
+
+        postService.getPostByKeyword(
+            page= 1,
+            size= 2,
+            sortBy= "createdAt",
+            direction= "desc",
+            keyword= "치와와"
+        )
+
+        cacheManager.getCache("keywordPostCache")!!.get("치와와-3-0") shouldNotBe null
+        cacheManager.getCache("keywordPostCache")!!.get("치와와-2-0") shouldNotBe null
+        cacheManager.getCache("keywordPostCache")!!.get("치와와-2-1") shouldNotBe null
+
+        postService.deletePost(postId = postId, userId = 1)
+
+        cacheManager.getCache("keywordPostCache")!!.get("치와와-3-0") shouldBe null
+        cacheManager.getCache("keywordPostCache")!!.get("치와와-2-0") shouldBe null
+        cacheManager.getCache("keywordPostCache")!!.get("치와와-2-1") shouldBe null
+        cacheManager.getCache("postCache")!!.get(postId) shouldBe null
 
 
     }
