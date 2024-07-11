@@ -61,13 +61,46 @@ class ViewCountUpdater(
 
 **캐시가 적용되지 않은 검색 API**
 ```
-fun getPostByKeywordNoCache
+fun getPostByKeywordNoCache(
+        page: Int,
+        size: Int,
+        sortBy: String,
+        direction: String,
+        keyword: String
+    ): PageResponse<PostResponse> {
+        val direction = getDirection(direction)
+        val pageable: Pageable = PageRequest.of(page, size, direction, sortBy)
+        val pageContent = postRepository.findByKeyword(pageable, keyword)
+
+        return PageResponse(
+            pageContent.content.map { PostResponse.from(it, commentService.getCommentList(it.id!!)) },
+            page,
+            size
+        )
+    }
 ```
 
 **캐시가 적용된 검색 API**
 ```
 @Cacheable(value = ["keywordPostCache"], key = "#keyword + '-' + #size + '-' + #page")
-fun getPostByKeyword
+    fun getPostByKeyword(
+        page: Int,
+        size: Int,
+        sortBy: String,
+        direction: String,
+        keyword: String
+    ): PageResponse<PostResponse> {
+        val direction = getDirection(direction)
+        val pageable: Pageable = PageRequest.of(page, size, direction, sortBy)
+        val pageContent = postRepository.findByKeyword(pageable, keyword)
+
+        return PageResponse(
+            pageContent.content.map { PostResponse.from(it, commentService.getCommentList(it.id!!)) },
+            page,
+            size
+        )
+
+    }
 ```
 
  - 검색 api에 캐시를 적용함으로써 자주 조회되는 인기검색어의 경우에 쿼리를 발생시키지 않고 캐시를 참조하기 때문에 성능향상에 도움이 된다.
