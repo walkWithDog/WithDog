@@ -21,6 +21,27 @@ fun evictCaches(breedName: String) {
 **캐시 참조시 조회수가 올라가지 않는 문제 발생**
  - 스케줄러를 이용해 1분간격으로 조회수 업데이트 되도록 해결
 
+```
+@Service
+class ViewCountUpdater(
+    private val postRepository: PostRepository,
+    private val viewCount: ViewCount
+) {
+
+    @Scheduled(fixedRate = 60000) // 1분 간격
+    @Transactional
+    fun updateViewCounts() {
+        val viewCounts = viewCount.getViewCountsAndClear()
+        for ((postId, count) in viewCounts) {
+            val post = postRepository.findByIdOrNull(postId)
+            if (post != null &&!post.isDeleted) {
+                post.views += count
+                postRepository.save(post)
+            }
+        }
+    }
+}
+```
    
 
 ## 📈 과제 요구사항
